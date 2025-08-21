@@ -3,27 +3,37 @@ import dotenv from "dotenv";
 import helmet from "helmet";
 import cors from "cors";
 import morgan from "morgan";
-import { pool } from "./database/database.js";
+import { rdsConnection } from "./databases/database.js";
 import router from "./routes/routes.js";
 
+// Load environment variables
 dotenv.config();
 
+// Build the server.
 const app = express();
+
+// Configure server port.
 const PORT = process.env.PORT || 3000;
 
-// Middleware.
+// Middleware for JSON parsing.
 app.use(express.json());
+
+// Middleware for CORS.
 app.use(cors());
+
+// Middleware for security.
 app.use(helmet({ contentSecurityPolicy: false }));
+
+// Middleware to log HTTP requests.
 app.use(morgan("dev"));
 
-// API.
+// Base url for API routes.
 app.use("/api", router);
 
-// Database.
+// Initialise RDS database.
 async function initDatabase() {
   try {
-    await pool.query(`
+    await rdsConnection.query(`
 			CREATE TABLE IF NOT EXISTS time_series (
 				date TIMESTAMP PRIMARY KEY,
 				price NUMERIC(5,2)
@@ -35,6 +45,7 @@ async function initDatabase() {
   }
 }
 
+// Start server once database initialised.
 initDatabase().then(() => {
   app.listen(PORT, () => {
     console.log("Server is running on port", PORT);

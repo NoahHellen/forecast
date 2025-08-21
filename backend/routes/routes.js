@@ -1,8 +1,10 @@
 import express from "express";
-import { getDataSet } from "../controllers/data_controller.js";
+import { getTimeSeries } from "../controllers/data_controller.js";
 
+// Build server router.
 const router = express.Router();
 
-router.get("/dataset", getDataSet);
+// Routes to controllers.
+router.get("/dataset", getTimeSeries);
 
 export default router;
