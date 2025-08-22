@@ -10,7 +10,7 @@ const appleData = parse(fs.readFileSync(path.resolve("seeds/apple.csv")), {
 });
 
 // // Correct date format.
-function convertDate(date) {
+export function convertDate(date) {
   if (!date) return null;
   const [month, day, year] = date.split("/");
   return `${year}-${month}-${day}`;

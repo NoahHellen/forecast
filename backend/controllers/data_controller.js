@@ -1,4 +1,5 @@
 import { rdsConnection } from "../databases/database.js";
+import { convertDate } from "../seeds/seed.js";
 
 // Get all time series data from RDS.
 export const getTimeSeries = async (req, res) => {
@@ -14,21 +15,34 @@ export const getTimeSeries = async (req, res) => {
   }
 };
 
+export const deleteTimeSeries = async (req, res) => {
+  try {
+    const timeSeries = await rdsConnection.query(
+      `DELETE FROM time_series RETURNING *`
+    )
+    res.status(200).json({success: true, data: timeSeries.rows})
+  } catch(error) {
+    console.error("Error in deleteTimeSeries function", error)
+    res.status(500).json({success: false, message: "Internal server error"})
+  }
+}
+
 // Create row in RDS.
 export const createRow = async (req, res) => {
   const { date, price } = req.body;
   if (!date || !price) {
     return res
       .status(400)
-      .json({ succes: false, message: "All fields are required" });
+      .json({ success: false, message: "All fields are required" });
   }
   try {
     const newRow = await rdsConnection.query(`
       INSERT INTO time_series (date, price)
-      VALUES (${date}, ${price})
-      RETURNING *
-      `);
-    res.status(201).json({ success: true, data: newRow[0] });
+      VALUES ($1, $2)
+      RETURNING *`,
+      [convertDate(date), price]
+      );
+    res.status(201).json({ success: true, data: newRow.rows[0] });
   } catch (error) {
     console.log("Error in createRow function", error);
     res.status(500).json({ success: false, message: "Internal server error" });
@@ -40,12 +54,13 @@ export const getRow = async (req, res) => {
   const { id } = req.params;
   try {
     const row = await rdsConnection.query(`
-      SELECT * FROM time_series WHERE date_id = ${id}
-    `);
-    if (!row[0]) {
+      SELECT * FROM time_series WHERE id = $1`, 
+      [id]
+    );
+    if (row.rows.length === 0) {
       return res.status(404).json({ success: false, message: "Row not found" });
     }
-    res.status(200).json({ success: true, data: row[0] });
+    res.status(200).json({ success: true, data: row.rows[0] });
   } catch (error) {
     console.error("Error in getRow function: ", error);
     res.status(500).json({ success: false, message: "Internal server error" });
@@ -58,21 +73,19 @@ export const updateRow = async (req, res) => {
   const { date, price } = req.body;
 
   try {
-    const row = await rdsConnection.query(`
-      UPDATE time_series
-      SET date=${date}, price=${price}
-      WHERE id=${id}
-      RETURNING *
-    `);
+    const row = await rdsConnection.query(
+      `UPDATE time_series SET date=$1, price=$2 WHERE id=$3 RETURNING *`,
+      [convertDate(date), price, id]
+    );
 
-    if (row.length === 0) {
+    if (row.rows.length === 0) {
       return res.status(404).json({
         success: false,
         message: "Row not found",
       });
     }
 
-    res.status(200).json({ success: true, data: row[0] });
+    res.status(200).json({ success: true, data: row.rows[0] });
   } catch (error) {
     console.log("Error in updateRow function", error);
     res.status(500).json({ success: false, message: "Internal Server Error" });
@@ -84,18 +97,19 @@ export const deleteRow = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const row = await sql`
-      DELETE FROM time_series WHERE id=${id} RETURNING *
-    `;
+    const row = await rdsConnection.query(
+      `DELETE FROM time_series WHERE id=$1 RETURNING *`,
+      [id]
+    );
 
-    if (row.length === 0) {
+    if (row.rows.length === 0) {
       return res.status(404).json({
         success: false,
         message: "Row not found",
       });
     }
 
-    res.status(200).json({ success: true, data: row[0] });
+    res.status(200).json({ success: true, data: row.rows[0] });
   } catch (error) {
     console.log("Error in deleteRow function", error);
     res.status(500).json({ success: false, message: "Internal Server Error" });
