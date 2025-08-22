@@ -19,6 +19,8 @@ function convertDate(date) {
 // Seed RDS database.
 async function seedDatabase() {
   try {
+    await rdsConnection.query(`TRUNCATE TABLE time_series RESTART IDENTITY`);
+
     for (const row of appleData) {
       await rdsConnection.query(
         `INSERT INTO time_series (date, price) VALUES ($1, $2)`,

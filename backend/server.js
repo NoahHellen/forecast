@@ -35,7 +35,8 @@ async function initDatabase() {
   try {
     await rdsConnection.query(`
 			CREATE TABLE IF NOT EXISTS time_series (
-				date TIMESTAMP PRIMARY KEY,
+        id SERIAL PRIMARY KEY,
+				date TIMESTAMP,
 				price NUMERIC(5,2)
 			)
 		`);
