@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { parse } from "csv-parse/sync";
-import { rdsConnection } from "../databases/database.js";
+import { rdsConnection } from "../config/database.js";
 
 // Read and load apple data.
 const appleData = parse(fs.readFileSync(path.resolve("seeds/apple.csv")), {

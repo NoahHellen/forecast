@@ -1,12 +1,11 @@
-import { rdsConnection } from "../databases/database.js";
-import { convertDate } from "../seeds/seed.js";
+import { rdsConnection } from "../config/database.js";
 
 // Get all time series data from RDS.
 export const getTimeSeries = async (req, res) => {
   try {
     const timeSeries = await rdsConnection.query(`
 			SELECT * FROM time_series
-			ORDER BY date DESC
+			ORDER BY date ASC
 		`);
     console.log("Time series data set fetched succesfully");
     res.status(200).json({ success: true, data: timeSeries.rows });
@@ -19,13 +18,13 @@ export const deleteTimeSeries = async (req, res) => {
   try {
     const timeSeries = await rdsConnection.query(
       `DELETE FROM time_series RETURNING *`
-    )
-    res.status(200).json({success: true, data: timeSeries.rows})
-  } catch(error) {
-    console.error("Error in deleteTimeSeries function", error)
-    res.status(500).json({success: false, message: "Internal server error"})
+    );
+    res.status(200).json({ success: true, data: timeSeries.rows });
+  } catch (error) {
+    console.error("Error in deleteTimeSeries function", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
-}
+};
 
 // Create row in RDS.
 export const createRow = async (req, res) => {
@@ -36,12 +35,13 @@ export const createRow = async (req, res) => {
       .json({ success: false, message: "All fields are required" });
   }
   try {
-    const newRow = await rdsConnection.query(`
+    const newRow = await rdsConnection.query(
+      `
       INSERT INTO time_series (date, price)
       VALUES ($1, $2)
       RETURNING *`,
-      [convertDate(date), price]
-      );
+      [date, price]
+    );
     res.status(201).json({ success: true, data: newRow.rows[0] });
   } catch (error) {
     console.log("Error in createRow function", error);
@@ -53,8 +53,9 @@ export const createRow = async (req, res) => {
 export const getRow = async (req, res) => {
   const { id } = req.params;
   try {
-    const row = await rdsConnection.query(`
-      SELECT * FROM time_series WHERE id = $1`, 
+    const row = await rdsConnection.query(
+      `
+      SELECT * FROM time_series WHERE id = $1`,
       [id]
     );
     if (row.rows.length === 0) {
@@ -75,7 +76,7 @@ export const updateRow = async (req, res) => {
   try {
     const row = await rdsConnection.query(
       `UPDATE time_series SET date=$1, price=$2 WHERE id=$3 RETURNING *`,
-      [convertDate(date), price, id]
+      [date, price, id]
     );
 
     if (row.rows.length === 0) {
