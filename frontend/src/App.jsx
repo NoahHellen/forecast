@@ -1,11 +1,15 @@
 import React from "react";
 import NavBar from "./components/NavBar";
 import Footer from "./components/Footer";
-import { Routes, Route } from "react-router-dom";
 import HomePage from "./app/HomePage";
 import BayesPage from "./app/BayesPage";
 import RowPage from "./app/RowPage";
 import EasterEgg from "./app/EasterEgg";
+import GetStartedPage from "./app/GetStartedPage";
+import TransformerPage from "./app/TransformerPage";
+import TimeSeriesPage from "./app/TimeSeriesPage";
+
+import { Routes, Route } from "react-router-dom";
 
 function App() {
   return (
@@ -13,8 +17,11 @@ function App() {
       <NavBar />
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/get-started" element={<GetStartedPage />} />
+        <Route path="/time-series" element={<TimeSeriesPage />} />
+        <Route path="/time-series/:id" element={<RowPage />} />
         <Route path="/bayes" element={<BayesPage />} />
-        <Route path="/bayes/:id" element={<RowPage />} />
+        <Route path="/transformer" element={<TransformerPage />} />
         <Route path="/easter-egg" element={<EasterEgg />} />
       </Routes>
       <Footer />

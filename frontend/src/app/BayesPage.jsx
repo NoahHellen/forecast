@@ -1,10 +1,10 @@
 import React from "react";
-import Bayes from "../components/Bayes";
+import BayesChart from "../components/bayes/BayesChart";
 
 function BayesPage() {
   return (
-    <div>
-      <Bayes />
+    <div className="max-w-6xl mx-auto px-4 py-8 pt-20">
+      <BayesChart />
     </div>
   );
 }

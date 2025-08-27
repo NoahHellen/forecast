@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import { useDatabase } from "../state/api";
+import { useDatabase } from "../../state/api";
 import { DollarSignIcon, PlusCircleIcon } from "lucide-react";
 
 function Modal() {

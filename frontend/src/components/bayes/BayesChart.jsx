@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
-import { useDatabase } from "../state/api";
+import { useDatabase } from "../../state/api";
 import { Line } from "react-chartjs-2";
-import Chart from "../lib/chart_config";
+import Chart from "../../lib/chart_config";
 
 function Bayes() {
   const { timeSeries = [], loading, error, fetchTimeSeries } = useDatabase();
