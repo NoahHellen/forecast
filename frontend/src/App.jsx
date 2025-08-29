@@ -3,7 +3,6 @@ import NavBar from "./components/NavBar";
 import Footer from "./components/Footer";
 import HomePage from "./app/HomePage";
 import BayesPage from "./app/BayesPage";
-import RowPage from "./app/RowPage";
 import EasterEgg from "./app/EasterEgg";
 import GetStartedPage from "./app/GetStartedPage";
 import TransformerPage from "./app/TransformerPage";
@@ -19,7 +18,6 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/get-started" element={<GetStartedPage />} />
         <Route path="/time-series" element={<TimeSeriesPage />} />
-        <Route path="/time-series/:id" element={<RowPage />} />
         <Route path="/bayes" element={<BayesPage />} />
         <Route path="/transformer" element={<TransformerPage />} />
         <Route path="/easter-egg" element={<EasterEgg />} />

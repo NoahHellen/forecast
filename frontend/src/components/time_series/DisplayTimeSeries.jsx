@@ -1,16 +1,52 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { useDatabase } from "../../state/api";
 import { Line } from "react-chartjs-2";
 import Chart from "../../lib/chart_config";
 import NoData from "./NoData";
+import { formatDate } from "../../utils/date";
+import ChangeDeleteModal from "./ChangeDeleteModal";
 
 function DisplayTimeSeries() {
-  const { timeSeries, loading, error, fetchTimeSeries } = useDatabase();
+  const {
+    timeSeries,
+    loading,
+    error,
+    fetchTimeSeries,
+    deleteRow,
+    setFormData,
+    updateRow,
+  } = useDatabase();
 
   // Fetch data once when component mounts
   useEffect(() => {
     fetchTimeSeries();
   }, []);
+
+  const chartRef = useRef(null);
+  const modalRef = useRef(null);
+
+  const handleChartClick = async (event) => {
+    if (!chartRef.current) return;
+
+    const chart = chartRef.current;
+
+    const chartPoint = chart.getElementsAtEventForMode(
+      event.nativeEvent,
+      "nearest",
+      { intersect: true },
+      true
+    );
+
+    const dataPoint = timeSeries[chartPoint[0].index];
+
+    setFormData({
+      date: formatDate(dataPoint.date),
+      price: dataPoint.price,
+      id: dataPoint.id,
+    });
+
+    modalRef.current.showModal();
+  };
 
   // Chart options
   const options = {
@@ -92,12 +128,22 @@ function DisplayTimeSeries() {
 
   if (loading) return <div>Loading chart data...</div>;
   if (error) return <div>Error: {error}</div>;
-  if (timeSeries.length === 0) return <div>No data available</div>;
+  if (timeSeries.length === 0)
+    return (
+      <div>
+        <NoData />
+      </div>
+    );
 
   return (
     <div style={{ height: "400px", width: "75%", margin: "0 auto" }}>
-      <Line options={options} data={data} />
-      <NoData />
+      <Line
+        onClick={handleChartClick}
+        ref={chartRef}
+        options={options}
+        data={data}
+      />
+      <ChangeDeleteModal ref={modalRef} />
     </div>
   );
 }

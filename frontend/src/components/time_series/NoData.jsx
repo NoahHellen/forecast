@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 import { useDatabase } from "../../state/api";
 
 function NoData() {
-  const { timeSeries, fetchTimeSeries } = useDatabase();
+  const { timeSeries, fetchTimeSeries, loading } = useDatabase();
 
   useEffect(() => {
     fetchTimeSeries;

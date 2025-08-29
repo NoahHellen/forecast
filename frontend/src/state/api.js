@@ -12,6 +12,7 @@ export const useDatabase = create((set, get) => ({
   currentRow: null,
 
   formData: {
+    id: null,
     date: "",
     price: "",
   },
@@ -44,6 +45,23 @@ export const useDatabase = create((set, get) => ({
     } catch (error) {
       if (error.status === 429) set({ error: "Rate limit exceeded" });
       else set({ error: "Something went wrong" });
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+  removeTimeSeries: async () => {
+    set({ loading: true });
+    try {
+      const response = await axios.delete(`${BASE_URL}/api/time-series`);
+      set((prev) => ({
+        ...prev,
+        timeSeries: [],
+      }));
+      toast.success("Deleted entire time series");
+    } catch (error) {
+      console.log("Error in removeTimeSeries function", error);
+      toast.error("Something went wrong");
     } finally {
       set({ loading: false });
     }
